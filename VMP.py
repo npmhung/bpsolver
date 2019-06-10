@@ -4,16 +4,16 @@ from cost import *
 from FFD import *
 
 n = 15   #number of VMs
-m = 10   #number of servers
+m = 15   #number of servers
 Pbusy = 215 # average power(Watts) of server in busy state
 Pidle = 162 # average power(Watts) of server in idle state
 # --> assumption thresholds of each server is 100.
 
 # threshold for cpu and memory.. assuming homogeneous system
-#Tp = 90*np.ones(m) # threshold of processor usage
-#Tm = 90*np.ones(m) # threshold of memory usage
-Tp = (np.random.rand(m)*100).round()
-Tm = (np.random.rand(m)*100).round()
+Tp = 90*np.ones(m) # threshold of processor usage
+Tm = 90*np.ones(m) # threshold of memory usage
+#Tp = (np.random.rand(m)*100).round()
+#Tm = (np.random.rand(m)*100).round()
 
 
 
@@ -55,8 +55,8 @@ idle = [Pidle]*m
 pms = list(zip(cpu, mem, busy, idle))
 
 
-from nonhomogeneous import M as stp_solver
-power, assign = stp_solver(vms[:n], pms[:m])
+from homogeneous import M as stp_solver
+server_used, assign = stp_solver(vms[:n], int(Tp[0]), int(Tm[0]))
 print("========================")
 print("========================")
 print("")
@@ -66,5 +66,13 @@ if assign is None:
     print("Cannot find a suitable assignment")
 else:
     print("assignment", assign)
-    print("Pt: ", power)
-    print("server used: ", len(assign))
+    #print("Pt: ", power)
+    print("server used: ", server_used)
+    power = 0
+    for pid in assign:
+        power += Pidle
+        cpu = 0
+        for vid in assign[pid]:
+            cpu += Rp[vid]
+        power += cpu*(Pbusy-Pidle)*0.01
+    print("Pt", power)
