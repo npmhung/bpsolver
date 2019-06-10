@@ -14,6 +14,6 @@ def cost(n,m,Pbusy,Pidle,X,y,Rp,Rm,Tp,Tm):
             Rpj = Rpj + X[i, j]*Rp[i]
             Rmj = Rmj + X[i, j] * Rm[i]
         if y[j]==1:
-            Pt = Pt + y[j] * (1) * ((Pbusy - Pidle) * Rpj + Pidle);
+            Pt = Pt + y[j] * (1) * ((Pbusy - Pidle) * (Rpj/100) + Pidle);
     return Pt
 
