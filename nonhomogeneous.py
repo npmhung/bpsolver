@@ -57,7 +57,7 @@ class HSolver:
             s.add(mem_util <= self.pms[pid]['mem'])
 
             diff = self.pms[pid]['pbusy'] - self.pms[pid]['pidle']
-            total_power_consumption += self.pms[pid]['pidle'] + cpu_utilization*diff
+            total_power_consumption += cpu_utilization*diff #+self.pms[pid]['pidle'] 
 
         s.add(total_power_consumption <= max_power)
 
@@ -119,7 +119,7 @@ def M(vms, pms):
 
     max_power = 0
     for cpu, _, busy, idle in pms:
-        max_power += cpu*(busy-idle)+idle
+        max_power += cpu*(busy-idle)#+idle
 
     bit_len = int(log(max_power)/log(2)+1)
 
@@ -135,7 +135,11 @@ def M(vms, pms):
     ret = int(''.join(ret), 2)
     solver.build(ret)
     if solver.check():
-        return ret, solver.assign()
+        assign = solver.assign()
+        pidle = 0
+        for pmid in assign:
+            pidle += pms[pmid][3]
+        return ret*0.01+pidle, assign
 
     return -1, None
 
