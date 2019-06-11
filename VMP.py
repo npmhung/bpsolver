@@ -3,8 +3,8 @@ from scipy.io import loadmat
 from cost import *
 from FFD import *
 
-n = 15   #number of VMs
-m = 15   #number of servers
+n = 200   #number of VMs
+m = 10   #number of servers
 Pbusy = 215 # average power(Watts) of server in busy state
 Pidle = 162 # average power(Watts) of server in idle state
 # --> assumption thresholds of each server is 100.
@@ -46,7 +46,7 @@ else:
 
 Rp = [int(u) for u in input[0][:, 0].round()]
 Rm = [int(u) for u in input[0][:, 1].round()]
-vms = list(zip(Rp, Rm))
+vms = list(zip(Rp, Rm))[:n]
 
 cpu = [int(u) for u in Tp]
 mem = [int(u) for u in Tm]
@@ -55,12 +55,12 @@ idle = [Pidle]*m
 pms = list(zip(cpu, mem, busy, idle))
 
 
-from homogeneous import M as stp_solver
-server_used, assign = stp_solver(vms[:n], int(Tp[0]), int(Tm[0]))
+from homogeneous import M as h_solver
+server_used, assign = h_solver(vms, int(Tp[0]), int(Tm[0]))
 print("========================")
 print("========================")
 print("")
-print("RESULTS FOR STP SOLVER")
+print("RESULTS FOR STP SOLVER - Homogeneous")
 print("=======================")
 if assign is None:
     print("Cannot find a suitable assignment")
@@ -76,3 +76,24 @@ else:
             cpu += Rp[vid]
         power += cpu*(Pbusy-Pidle)*0.01
     print("Pt", power)
+
+
+#Uncomment this to run the NON-HOMOGENEOUS version
+
+
+#from nonhomogeneous import M as nh_solver
+#power, assign = nh_solver(vms, pms)
+#print("========================")
+#print("========================")
+#print("")
+#print("RESULTS FOR STP SOLVER - Non-homogeneous")
+#print("=======================")
+#if assign is None:
+#    print("Cannot find a suitable assignment")
+#else:
+#    print("assignment {server_id:[vm1, vm2, ...],...}:\n", assign)
+#    print("Pt", power)
+#    print("server used: ", len(assign))
+    
+
+
